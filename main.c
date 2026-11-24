@@ -18,7 +18,10 @@ typedef struct {
     double notas[4];    
 }Aluno;
 
-bool AumentarCapacidade(int *capacidade, Aluno **v){
+//funcao para aumentar a capacidade do vetor dinamico ele é bool para retornar se deu certo ou nao, assim como o VerificarCapacidade()
+bool AumentarCapacidade(int *capacidade, Aluno **v){ 
+    /*foi usado **v pois é para aumentar a capacidade do vetor dentro de uma funcao, se não fosse usado isso poderia causar problemas com o realloc pois ele muda o endereco de memoria pois ele busca um novo espaco e isso poderia fazer perder o endereco original, e como se fosse um ponteiro de um ponteiro*/
+
     int novaCapacidade = (*capacidade)*2;
     Aluno *aux = realloc(*v, novaCapacidade * sizeof(Aluno));
     
@@ -32,6 +35,7 @@ bool AumentarCapacidade(int *capacidade, Aluno **v){
     return true;
 }
 
+//funcao para verificar a capacidade do vetor dinamico, se ainda tem espaco ou nao dentro dele, se nao tiver espaço ele vai chamar a funcao AumentarCapacidade()
 bool VerificarCapacidade(int alunosCadastrados, int *capacidade, Aluno **v){
     if (alunosCadastrados == *capacidade){
         return AumentarCapacidade(capacidade, v);
@@ -39,7 +43,9 @@ bool VerificarCapacidade(int alunosCadastrados, int *capacidade, Aluno **v){
     return true;
 }
 
+//funcao para cadastrar um aluno, ela pede todas as informações da struct e cadastra ele por um ponteiro de vetor dinamico
 void CadastrarAluno(int *alunosCadastrados, Aluno *v ){
+    /*Aqui nao e utilizado o **v pois nao vai usar o realloc entao nao ha risco de ser mudado o endereco de memoria*/
     LimparTela();
     int i = *alunosCadastrados;
 
@@ -62,6 +68,7 @@ void CadastrarAluno(int *alunosCadastrados, Aluno *v ){
     (*alunosCadastrados)++;
 }
 
+//painel meramente ilustrativo para mostrar as funcionalidades
 void painel(){
     printf("[1] Cadastrar aluno\n [2] Listar Alunos\n [3]Buscar aluno pela matricula\n [4]Editar um aluno\n [5]Remover aluno\n [0]Sair\n Digite qual acao voce deseja realizar: ");
 }
@@ -70,6 +77,7 @@ void painel(){
 
 
 int main(int argc, char const *argv[]){
+    //iniciei os vetores dinamicos
     int resp = 0, alunosCadastrados = 0;
     int capacidade = 2;
 
@@ -88,6 +96,7 @@ int main(int argc, char const *argv[]){
 
         switch (resp){
             case 1:{
+                /*peco para colocar quantos alunos quero cadastrar e assim chamo a funcao de cadastrar, tambem coloco num for para ficar se repetindo para cadastrar a quantidade de alunos desejados*/
                 int qtd;
                 printf("Quantos alunos deseja cadastrar? ");
                 scanf("%d", &qtd);
