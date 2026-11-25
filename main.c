@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 
+//Por favor, rodar o codigo no terminal terminal mesmo, sem ser powershell ou sla oq, o codigo fica travado as vezes quando é em outros locais porque nao da o \n e essas nao funciona a funcao de limpar tela 
+
 void LimparTela(void) {
     #if defined(_WIN32) || defined(_WIN64)
         system("cls");
@@ -21,7 +23,8 @@ typedef struct {
     char nome[50];
     int matricula;
     int idade;
-    double notas[4];    
+    double notas[4];
+    char situacao[15]; // MUDANÇA: aumentado de 10 para 15 para evitar estourar o limite de caracteres
 }Aluno;
 
 //funcao para aumentar a capacidade do vetor dinamico ele é bool para retornar se deu certo ou nao, assim como o VerificarCapacidade()
@@ -75,6 +78,22 @@ bool VerificarNota(double nota){
     return false;
 }
 
+//Funcao para saber se o aluno esta aprovado ou reprovado
+void AtualizarSituacao(Aluno *aluno, int indice){
+    double soma = 0, media;
+    
+    for (int i = 0; i < 4; i++){
+        soma += aluno[indice].notas[i];    
+    }
+    media = soma / 4.0;
+
+    if (media >= 7.0){
+        strcpy(aluno[indice].situacao, "Aprovado");
+    } else {
+        strcpy(aluno[indice].situacao, "Reprovado");
+    }
+}
+
 //funcao para cadastrar um aluno, ela pede todas as informações da struct e cadastra ele por um ponteiro de vetor dinamico
 void CadastrarAluno(int *alunosCadastrados, Aluno *aluno, int numeroOrdem){
     LimparTela();
@@ -116,8 +135,8 @@ void CadastrarAluno(int *alunosCadastrados, Aluno *aluno, int numeroOrdem){
         
     } while (!idadeValida);
     
-    
     for (int j = 0; j < 4; j++){
+        notaValida = false; // MUDANÇA: reseta a flag a cada nota
         do{
             printf("Digite a %d nota do(a) aluno(a):\n", (j+1));
             scanf("%lf", &novaNota);
@@ -130,7 +149,7 @@ void CadastrarAluno(int *alunosCadastrados, Aluno *aluno, int numeroOrdem){
         } while (!notaValida);
     }
     
-    
+    AtualizarSituacao(aluno, i); // MUDANÇA: define a situacao inicial apos cadastrar as notas
 
     (*alunosCadastrados)++;
 }
@@ -138,14 +157,13 @@ void CadastrarAluno(int *alunosCadastrados, Aluno *aluno, int numeroOrdem){
 //funcao para listar os alunos ja cadastrados
 void ListarAlunos(Aluno *aluno, int alunosCadastrados){
     for (int i = 0; i < alunosCadastrados; i++){
-        printf("\n--- Aluno %d ---\n Matricula: %d\n Nome: %s\n Idade: %d\n", (i + 1), aluno[i].matricula, aluno[i].nome, aluno[i].idade);
+        // MUDANÇA: exibe a situacao do aluno na listagem
+        printf("\n--- Aluno %d ---\n Matricula: %d\n Nome: %s\n Idade: %d\n Situacao: %s\n", (i + 1), aluno[i].matricula, aluno[i].nome, aluno[i].idade, aluno[i].situacao);
         printf("Notas: \n");
         for (int j = 0; j < 4; j++){
             printf("Nota %d: %.2lf\n", (j+1), (aluno[i].notas[j])); 
         }
-        
     }
-    
 }
 
 //funcao para buscar e pegar as informações de um aluno pela matricula
@@ -187,6 +205,7 @@ void EditarAluno(Aluno *aluno, int indice){
         }
             //muda a idade
         case 2:{
+            validaIdade = false;
             do{
                 printf("Idade atual: %d\n Nova idade: ", aluno[indice].idade);
 
@@ -233,7 +252,8 @@ void EditarAluno(Aluno *aluno, int indice){
                             
                         } while (!validaNota);
                         
-                        printf("\n Ok, Nova primeira nota: %.2lf", aluno[indice].notas[0]);
+                        AtualizarSituacao(aluno, indice); 
+                        printf("\n Ok, Nova primeira nota: %.2lf\n Situacao atual: %s", aluno[indice].notas[0], aluno[indice].situacao);
                         
                         LimparBufferEntrada();
                         printf("\nPressione Enter para continuar...");
@@ -256,7 +276,8 @@ void EditarAluno(Aluno *aluno, int indice){
                             
                         } while (!validaNota);
                         
-                        printf("\n Ok, Nova segunda nota: %.2lf", aluno[indice].notas[1]);
+                        AtualizarSituacao(aluno, indice); 
+                        printf("\n Ok, Nova segunda nota: %.2lf\n Situacao atual: %s", aluno[indice].notas[1], aluno[indice].situacao);
                         
                         LimparBufferEntrada();
                         printf("\nPressione Enter para continuar...");
@@ -279,7 +300,8 @@ void EditarAluno(Aluno *aluno, int indice){
                             
                         } while (!validaNota);
                         
-                        printf("\n Ok, Nova terceira nota: %.2lf", aluno[indice].notas[2]);
+                        AtualizarSituacao(aluno, indice); 
+                        printf("\n Ok, Nova terceira nota: %.2lf\n Situacao atual: %s", aluno[indice].notas[2], aluno[indice].situacao);
                         
                         LimparBufferEntrada();
                         printf("\nPressione Enter para continuar...");
@@ -302,7 +324,8 @@ void EditarAluno(Aluno *aluno, int indice){
                             
                         } while (!validaNota);
                         
-                        printf("\n Ok, Nova quarta nota: %.2lf", aluno[indice].notas[3]);
+                        AtualizarSituacao(aluno, indice); 
+                        printf("\n Ok, Nova quarta nota: %.2lf\n Situacao atual: %s", aluno[indice].notas[3], aluno[indice].situacao);
                         
                         LimparBufferEntrada();
                         printf("\nPressione Enter para continuar...");
@@ -312,8 +335,8 @@ void EditarAluno(Aluno *aluno, int indice){
                     }
                     //muda todas as notas
                     case 5:{
-                        validaNota = false;
                         for (int i = 0; i < 4; i++){
+                            validaNota = false; 
                             do{
                                 printf("\nNota %d atual: %.2lf\n Nova nota: ", (i+1), aluno[indice].notas[i]);
                                 scanf("%lf", &novaNota);
@@ -326,14 +349,14 @@ void EditarAluno(Aluno *aluno, int indice){
                             } while (!validaNota);
                         }
                         
-                        
-                        
+                        AtualizarSituacao(aluno, indice); 
                         
                         printf("\nOk, Novas notas: \n");
                         
                         for (int i = 0; i < 4; i++){    
                             printf("Nota %d: %.2lf\n", (i+1), aluno[indice].notas[i]);
                         }
+                        printf("Situacao atual: %s\n", aluno[indice].situacao); 
                         
                         LimparBufferEntrada();
                         printf("\nPressione Enter para continuar...");
@@ -478,7 +501,7 @@ int main(){
                 
                 indice = BuscarAluno(aluno, alunosCadastrados, matriculaBusca);
                 if (indice != -1){
-                    printf("Aluno encontrado!\n Matricula: %d\n Nome: %s\n Idade: %d\n Notas:\n", aluno[indice].matricula, aluno[indice].nome, aluno[indice].idade);
+                    printf("Aluno encontrado!\n Matricula: %d\n Nome: %s\n Idade: %d\n Situacao: %s\n Notas:\n", aluno[indice].matricula, aluno[indice].nome, aluno[indice].idade, aluno[indice].situacao);
                     for (int i = 0; i < 4; i++){
                         printf("Nota %d: %.2lf\n", (i+1), aluno[indice].notas[i]);
                     }
@@ -553,15 +576,15 @@ int main(){
             }
 
             default:{
-                        printf("Digite uma opcao valida!");
-                        
-                        LimparBufferEntrada();
-                        printf("\nPressione Enter para continuar...");
-                        getchar();
-                        LimparTela();
+                printf("Digite uma opcao valida!");
+                
+                LimparBufferEntrada();
+                printf("\nPressione Enter para continuar...");
+                getchar();
+                LimparTela();
 
-                        break;
-                    }
+                break;
+            }
         }
         
     } while (resp != 0);
