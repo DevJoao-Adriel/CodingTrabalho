@@ -10,6 +10,7 @@ void LimparTela(void) {
     #endif
 }
 
+//função para limpar o buffer de entrada pois queria que em determinado momento do programa o usuario clicasse enter para prosseguir mas o buffer de entrada quase sempre ta cheio, então antes de eu pedir pro usuario clicar enter eu limpo o buffer de entrada
 void LimparBufferEntrada(){
     int caractere;
     while ((caractere = getchar()) != '\n' && caractere != EOF);
@@ -47,6 +48,7 @@ bool VerificarCapacidade(int alunosCadastrados, int *capacidade, Aluno **aluno){
     return true;
 }
 
+//funcao para ver se uma matricula e igual a uma que ja exista
 bool VerificarMatricula(int alunosCadstrados, Aluno *aluno, int novaMatricula){
     for (int i = 0; i < alunosCadstrados; i++){
         if (novaMatricula == aluno[i].matricula){
@@ -57,8 +59,6 @@ bool VerificarMatricula(int alunosCadstrados, Aluno *aluno, int novaMatricula){
 }
 
 //funcao para cadastrar um aluno, ela pede todas as informações da struct e cadastra ele por um ponteiro de vetor dinamico
-// ... (mantenha LimparTela, struct Aluno, LimparBufferEntrada, AumentarCapacidade e VerificarCapacidade iguais)
-
 void CadastrarAluno(int *alunosCadastrados, Aluno *aluno, int numeroOrdem){
     LimparTela();
     printf("--- Aluno %d ---\n", numeroOrdem);
@@ -95,6 +95,7 @@ void CadastrarAluno(int *alunosCadastrados, Aluno *aluno, int numeroOrdem){
     (*alunosCadastrados)++;
 }
 
+//funcao para listar os alunos ja cadastrados
 void ListarAlunos(Aluno *aluno, int alunosCadastrados){
     for (int i = 0; i < alunosCadastrados; i++){
         printf("\n--- Aluno %d ---\n Matricula: %d\n Nome: %s\n Idade: %d\n", (i + 1), aluno[i].matricula, aluno[i].nome, aluno[i].idade);
@@ -107,6 +108,7 @@ void ListarAlunos(Aluno *aluno, int alunosCadastrados){
     
 }
 
+//funcao para buscar e pegar as informações de um aluno pela matricula
 int BuscarAluno(Aluno *aluno, int alunosCadastrados, int matricula){
     for (int i = 0; i < alunosCadastrados; i++){
         if (matricula == aluno[i].matricula){
